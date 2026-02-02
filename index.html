@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>One Question 💌</title>
+  <style>
+    :root { --bg1:#0f172a; --bg2:#1f2937; --card:#0b1220cc; --text:#e5e7eb; }
+    *{ box-sizing:border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body{
+      margin:0; min-height:100vh; display:grid; place-items:center;
+      background: radial-gradient(1200px 800px at 20% 10%, #334155 0%, transparent 60%),
+                  radial-gradient(1000px 700px at 80% 30%, #6d28d9 0%, transparent 55%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      color:var(--text);
+      overflow:hidden;
+    }
+    .card{
+      width:min(720px, 92vw);
+      padding:28px 22px;
+      background:var(--card);
+      border:1px solid #334155;
+      border-radius:18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+      position:relative;
+      backdrop-filter: blur(10px);
+    }
+    h1{ margin:0 0 10px; font-size: clamp(26px, 3.2vw, 40px); letter-spacing:.2px; }
+    p{ margin:0 0 18px; opacity:.9; line-height:1.5; font-size: clamp(14px, 2.1vw, 18px); }
+    .hint{ font-size:13px; opacity:.7; margin-top:12px; }
+    .stage{
+      position:relative;
+      width:100%;
+      height:260px;
+      border-radius:14px;
+      border:1px dashed #475569;
+      background: rgba(15,23,42,.35);
+      overflow:hidden;
+      margin-top:16px;
+    }
+    .btn{
+      border:0;
+      padding:14px 18px;
+      border-radius:999px;
+      font-weight:700;
+      font-size:16px;
+      cursor:pointer;
+      user-select:none;
+      touch-action: manipulation;
+      transition: transform .08s ease, filter .15s ease;
+      box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    }
+    .btn:active{ transform: scale(.98); }
+    .yes{
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color:#052e16;
+    }
+    .yes:hover{ filter: brightness(1.05); }
+    .no{
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      color:#fff;
+      position:absolute;
+      left:58%;
+      top:58%;
+    }
+    .yesWrap{
+      position:absolute;
+      left:22%;
+      top:58%;
+    }
+
+    /* Modal */
+    .modal{
+      position:fixed; inset:0; display:none; place-items:center;
+      background: rgba(0,0,0,.55);
+      padding:18px;
+      z-index: 9000;
+    }
+    .modal.show{ display:grid; }
+    .modalCard{
+      width:min(640px, 92vw);
+      background:#0b1220;
+      border:1px solid #334155;
+      border-radius:18px;
+      padding:22px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+      text-align:center;
+    }
+    .big{ font-size: clamp(24px, 3vw, 34px); margin:0 0 10px; }
+    .small{ opacity:.9; margin:0 0 16px; }
+    .row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .ghost{
+      background: transparent;
+      border:1px solid #475569;
+      color:#e5e7eb;
+    }
+    .copy{
+      background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+      color:#052e16;
+    }
+
+    /* CONFETTI CANVAS */
+    canvas#confetti {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+      display: none;
+    }
+    canvas#confetti.show { display: block; }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+
+  <div class="card">
+    <h1>Kowsy 💛</h1>
+    <p>
+      I know we’re miles apart right now… but my feelings are right here.
+      So I have one question:
+      <br><br>
+      <strong>Would you be my girlfriend?</strong>
+    </p>
+
+    <div class="stage" id="stage" aria-label="Buttons area">
+      <div class="yesWrap">
+        <button class="btn yes" id="yesBtn">Yes 💚</button>
+      </div>
+      <button class="btn no" id="noBtn" aria-label="No button">No ❤️‍🔥</button>
+    </div>
+
+    <div class="hint">Tip: On mobile, try tapping “No.” 😄</div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modalCard">
+      <p class="big">YAYYYYY 😭💛</p>
+
+      <!-- GIF (you can swap the URL anytime) -->
+      <img id="yesGif"
+           src="https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif"
+           alt="Celebration"
+           style="max-width:260px;width:70%;border-radius:14px;margin:10px auto 14px;display:block;">
+
+      <p class="small" id="successText">
+        Kowsy, you just made me the happiest person. Happy (early) Valentine’s Day, my love 💌
+      </p>
+
+      <div class="row">
+        <button class="btn copy" id="copyBtn">Copy cute message</button>
+        <button class="btn ghost" id="closeBtn">Close</button>
+      </div>
+      <p class="hint">You can paste the message into WhatsApp/IG right after she clicks Yes.</p>
+    </div>
+  </div>
+
+  <script>
+    const stage = document.getElementById('stage');
+    const noBtn = document.getElementById('noBtn');
+    const yesBtn = document.getElementById('yesBtn');
+    const modal = document.getElementById('modal');
+    const closeBtn = document.getElementById('closeBtn');
+    const copyBtn = document.getElementById('copyBtn');
+
+    // Put the "No" button somewhere random (but inside the stage).
+    function moveNoButton() {
+      const pad = 12;
+      const stageRect = stage.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      const maxX = stageRect.width - btnRect.width - pad;
+      const maxY = stageRect.height - btnRect.height - pad;
+
+      const x = Math.max(pad, Math.random() * maxX);
+      const y = Math.max(pad, Math.random() * maxY);
+
+      noBtn.style.left = x + 'px';
+      noBtn.style.top = y + 'px';
+    }
+
+    // Make it dodge the cursor when it gets close.
+    function onPointerMove(e) {
+      const stageRect = stage.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      // pointer position relative to stage
+      const px = e.clientX - stageRect.left;
+      const py = e.clientY - stageRect.top;
+
+      // button center relative to stage
+      const bx = (btnRect.left - stageRect.left) + btnRect.width / 2;
+      const by = (btnRect.top - stageRect.top) + btnRect.height / 2;
+
+      const dist = Math.hypot(px - bx, py - by);
+
+      // If pointer comes within 110px, run away 😄
+      if (dist < 110) moveNoButton();
+    }
+
+    // Desktop: dodge cursor
+    stage.addEventListener('mousemove', onPointerMove);
+
+    // Mobile: if they try to tap "No", it moves
+    noBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      moveNoButton();
+    }, { passive: false });
+
+    // Also move if they hover directly on it
+    noBtn.addEventListener('mouseenter', moveNoButton);
+
+    // YES flow: show modal + confetti
+    yesBtn.addEventListener('click', () => {
+      modal.classList.add('show');
+      launchConfetti(1800);
+    });
+
+    closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('show');
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      const msg = "Kowsy 💛 You just made me the happiest person. Happy (early) Valentine’s Day, my love 💌";
+      try {
+        await navigator.clipboard.writeText(msg);
+        copyBtn.textContent = "Copied ✅";
+        setTimeout(() => (copyBtn.textContent = "Copy cute message"), 1400);
+      } catch {
+        alert("Couldn’t copy automatically. Here it is:\n\n" + msg);
+      }
+    });
+
+    // CONFETTI (offline)
+    function launchConfetti(durationMs = 1600) {
+      const canvas = document.getElementById('confetti');
+      const ctx = canvas.getContext('2d');
+
+      const dpr = window.devicePixelRatio || 1;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      canvas.classList.add('show');
+
+      const pieces = Array.from({ length: 180 }).map(() => ({
+        x: Math.random() * w,
+        y: -20 - Math.random() * h * 0.3,
+        r: 4 + Math.random() * 6,
+        vy: 2 + Math.random() * 5,
+        vx: -2 + Math.random() * 4,
+        rot: Math.random() * Math.PI,
+        vrot: -0.15 + Math.random() * 0.3,
+        shape: Math.random() > 0.35 ? 'rect' : 'circle'
+      }));
+
+      const start = performance.now();
+
+      function frame(t) {
+        const elapsed = t - start;
+        ctx.clearRect(0, 0, w, h);
+
+        pieces.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vrot;
+
+          if (p.x < -30) p.x = w + 30;
+          if (p.x > w + 30) p.x = -30;
+
+          p.vy += 0.02;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+
+          const hue = (p.x / w) * 360;
+          ctx.fillStyle = `hsl(${hue}, 90%, 60%)`;
+
+          if (p.shape === 'rect') {
+            ctx.fillRect(-p.r, -p.r * 0.6, p.r * 2, p.r * 1.2);
+          } else {
+            ctx.beginPath();
+            ctx.arc(0, 0, p.r * 0.7, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          ctx.restore();
+        });
+
+        if (elapsed < durationMs) {
+          requestAnimationFrame(frame);
+        } else {
+          canvas.classList.remove('show');
+          ctx.clearRect(0, 0, w, h);
+        }
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    // Start with a fun random placement
+    moveNoButton();
+  </script>
+</body>
+</html>
