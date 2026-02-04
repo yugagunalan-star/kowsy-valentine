@@ -68,6 +68,13 @@
 
     .yesWrap{ position:absolute; left:22%; top:58%; }
 
+    .hint{
+      font-size:13px;
+      opacity:.7;
+      margin-top:10px;
+      text-align:center;
+    }
+
     .modal{
       position:fixed; inset:0; display:none; place-items:center;
       background:rgba(0,0,0,.55);
@@ -123,15 +130,18 @@
     </div>
     <button class="btn no" id="noBtn">No ❤️‍🔥</button>
   </div>
+
+  <div class="hint">Go ahead… try clicking “No” 😄</div>
 </div>
 
 <div class="modal" id="modal">
   <div class="modalCard">
     <p class="big">You said YES 😭💛</p>
 
+    <!-- Pudgy Penguins GIF -->
     <img
-      src="https://media.giphy.com/media/wHe2ByyPcroSR02AcG/giphy.gif"
-      alt="Love"
+      src="https://media.giphy.com/media/WcAAwQ0MXpXHs4UQWm/giphy.gif"
+      alt="You and Me"
       style="max-width:260px;width:70%;border-radius:14px;margin:10px auto 14px;display:block;"
     />
 
@@ -160,7 +170,6 @@
   }
 
   stage.addEventListener('mousemove', e => {
-    const s = stage.getBoundingClientRect();
     const b = noBtn.getBoundingClientRect();
     const dx = e.clientX - (b.left + b.width/2);
     const dy = e.clientY - (b.top + b.height/2);
@@ -186,7 +195,7 @@
     const pieces = Array.from({length:160},()=>({
       x:Math.random()*w,
       y:-20,
-      r:4+Math.random()*6,
+      r:6,
       vy:2+Math.random()*4,
       vx:-2+Math.random()*4
     }));
@@ -196,8 +205,10 @@
       x.clearRect(0,0,w,h);
       pieces.forEach(p=>{
         p.x+=p.vx; p.y+=p.vy;
-        x.fillStyle=`hsl(${Math.random()*360},90%,60%)`;
-        x.fillRect(p.x,p.y,p.r,p.r);
+        x.fillStyle='#ef4444'; // RED HEARTS
+        x.beginPath();
+        x.arc(p.x,p.y,p.r,0,Math.PI*2);
+        x.fill();
       });
       if(t++<90) requestAnimationFrame(draw);
       else c.classList.remove('show');
