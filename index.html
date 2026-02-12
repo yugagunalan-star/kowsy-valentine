@@ -3,14 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>One Question 💌</title>
+  <title>One Question ❤️</title>
 
   <style>
     :root { --bg1:#0f172a; --bg2:#1f2937; --card:#0b1220cc; --text:#e5e7eb; }
     *{ box-sizing:border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
 
     body{
-      margin:0; min-height:100vh; display:grid; place-items:center;
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
       background:
         radial-gradient(1200px 800px at 20% 10%, #334155 0%, transparent 60%),
         radial-gradient(1000px 700px at 80% 30%, #6d28d9 0%, transparent 55%),
@@ -30,7 +33,7 @@
     }
 
     h1{ margin:0 0 12px; font-size:clamp(26px,3.2vw,40px); }
-    p{ margin:0 0 18px; line-height:1.55; opacity:.92; font-size:clamp(15px,2.2vw,18px); }
+    p{ margin:0 0 18px; line-height:1.6; opacity:.92; font-size:clamp(15px,2.2vw,18px); }
     strong{ font-weight:700; }
 
     .stage{
@@ -54,12 +57,14 @@
       box-shadow:0 10px 25px rgba(0,0,0,.25);
       transition:transform .08s ease, filter .15s ease;
     }
+
     .btn:active{ transform:scale(.97); }
 
     .yes{
       background:linear-gradient(135deg,#22c55e,#16a34a);
       color:#052e16;
     }
+
     .no{
       background:linear-gradient(135deg,#ef4444,#b91c1c);
       color:#fff;
@@ -76,10 +81,14 @@
     }
 
     .modal{
-      position:fixed; inset:0; display:none; place-items:center;
+      position:fixed;
+      inset:0;
+      display:none;
+      place-items:center;
       background:rgba(0,0,0,.55);
       z-index:9000;
     }
+
     .modal.show{ display:grid; }
 
     .modalCard{
@@ -93,15 +102,18 @@
     }
 
     .big{ font-size:clamp(24px,3vw,34px); margin-bottom:10px; }
-    .small{ opacity:.92; line-height:1.55; }
+    .small{ opacity:.92; line-height:1.6; }
 
     canvas#confetti{
-      position:fixed; inset:0;
-      width:100vw; height:100vh;
+      position:fixed;
+      inset:0;
+      width:100vw;
+      height:100vh;
       pointer-events:none;
       z-index:9999;
       display:none;
     }
+
     canvas#confetti.show{ display:block; }
   </style>
 </head>
@@ -111,13 +123,14 @@
 <canvas id="confetti"></canvas>
 
 <div class="card">
-  <h1>Kowsy 💛</h1>
+  <h1>Kowsy ❤️</h1>
 
   <p>
     It’s crazy to think how destiny brought us together… literally days later and we might not have met at all.
     <br><br>
-    Even with the distance, you’ve slowly become someone really special to me.
-    You make my days lighter, my smiles easier, and my heart a little fuller.
+    Even with the distance, you’ve quietly become someone I truly value.
+    <br>
+    You’ve brought a calm happiness into my life that I didn’t expect, but now can’t imagine without.
     <br><br>
     I don’t want to overthink this. I know what I feel.
     <br><br>
@@ -138,7 +151,6 @@
   <div class="modalCard">
     <p class="big">You said YES 😭❤️</p>
 
-    <!-- Pudgy Penguins GIF -->
     <img
       src="https://media.giphy.com/media/WcAAwQ0MXpXHs4UQWm/giphy.gif"
       alt="You and Me"
@@ -146,19 +158,18 @@
     />
 
     <p class="small">
-  Being with you just feels natural.  
-  Like something my heart already knew before I did.
-  <br><br>
-  Somewhere between our conversations, the laughs, and the quiet moments, you became someone really important to me.
-  You make my world feel lighter, softer, and more exciting all at once.
-  <br><br>
-  Thank you for choosing us, even with the miles between us. 😘
-  I don’t take that lightly.
-  <br><br>
-  I’m really excited to grow this together, to learn each other more deeply, and to see where life takes us.
-  <br><br>
-  Happy Valentine’s Day, my girl ❤️
-</p>
+      Being with you just feels natural.<br>
+      Like something my heart already knew before I did.
+      <br><br>
+      Somewhere between our conversations, the laughs, and the quiet moments, you became someone really important to me.
+      You make my world feel lighter, softer, and more exciting all at once.
+      <br><br>
+      Thank you for choosing us, even with the miles between us. 😘
+      I don’t take that lightly.
+      <br><br>
+      I’m really excited to grow this together, to learn each other more deeply, and to see where life takes us.
+      <br><br>
+      Happy Valentine’s Day, my girl ❤️
     </p>
   </div>
 </div>
@@ -170,10 +181,13 @@
   const modal = document.getElementById('modal');
 
   function moveNo(){
+    const pad = 10;
     const s = stage.getBoundingClientRect();
     const b = noBtn.getBoundingClientRect();
-    noBtn.style.left = Math.random() * (s.width - b.width) + 'px';
-    noBtn.style.top  = Math.random() * (s.height - b.height) + 'px';
+    const maxX = Math.max(pad, s.width - b.width - pad);
+    const maxY = Math.max(pad, s.height - b.height - pad);
+    noBtn.style.left = (pad + Math.random() * (maxX - pad)) + 'px';
+    noBtn.style.top  = (pad + Math.random() * (maxY - pad)) + 'px';
   }
 
   stage.addEventListener('mousemove', e => {
@@ -196,7 +210,8 @@
     const x = c.getContext('2d');
     const w = window.innerWidth;
     const h = window.innerHeight;
-    c.width = w; c.height = h;
+    c.width = w;
+    c.height = h;
     c.classList.add('show');
 
     const pieces = Array.from({length:160},()=>({
@@ -211,8 +226,9 @@
     (function draw(){
       x.clearRect(0,0,w,h);
       pieces.forEach(p=>{
-        p.x+=p.vx; p.y+=p.vy;
-        x.fillStyle='#ef4444'; // RED HEARTS
+        p.x+=p.vx;
+        p.y+=p.vy;
+        x.fillStyle='#ef4444';
         x.beginPath();
         x.arc(p.x,p.y,p.r,0,Math.PI*2);
         x.fill();
@@ -227,5 +243,3 @@
 
 </body>
 </html>
-
-
